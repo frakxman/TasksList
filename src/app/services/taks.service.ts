@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Task } from '../models/task.model';
-import { Observable, map, of, throwError, switchMap } from 'rxjs';
+import { Observable, map, of, throwError, switchMap, catchError, tap } from 'rxjs';
 
 /**
  * Task Service
@@ -94,47 +94,16 @@ export class TaksService {
   /**
    * Updates an existing task
    *
-   * Since the API doesn't support individual task endpoints, this method
-   * fetches all tasks, updates the specific one locally, and then sends
-   * the entire updated collection back to the server.
-   *
    * @param id - The ID of the task to update
    * @param changes - The partial Task object containing the properties to update
    * @returns An Observable that emits the updated Task
-   * @throws Error if the task with the specified ID is not found
-   * @throws Error if the update would create a duplicate title
    */
-  updateTask(id: number, changes: Partial<Task>): Observable<Task> {
-    // First get all tasks
-    return this.getTask().pipe(
-      map(tasks => {
-        // Find the task to update
-        const taskIndex = tasks.findIndex(t => t.id === id);
-        if (taskIndex === -1) {
-          throw new Error(`Task with id ${id} not found`);
-        }
-
-        // Create an updated version of the task
-        const updatedTask = { ...tasks[taskIndex], ...changes };
-
-        // Only check for duplicate title if the title is being changed
-        if (changes.title) {
-          // Check if this update would create a duplicate title (excluding the current task)
-          const otherTasks = tasks.filter(t => t.id !== id);
-          if (this.isDuplicateTitle(otherTasks, updatedTask)) {
-            throw new Error('A task with this title already exists. Please use a different title.');
-          }
-        }
-
-        // Create a new list with the updated task
-        const updatedTasks = [...tasks];
-        updatedTasks[taskIndex] = updatedTask;
-
-        // Send the complete updated list to the server
-        this.http.put(this.apiUrl, updatedTasks).subscribe();
-
-        // Return the updated task
-        return updatedTask;
+  updateTask(id: string | number, changes: Partial<Task>): Observable<Task> {
+    // Send the updated task to the server
+    return this.http.patch<Task>(`${this.apiUrl}/${id}`, changes).pipe(
+      catchError(error => {
+        console.error('Error updating task:', error);
+        return throwError(() => new Error('Failed to update task. Server error.'));
       })
     );
   }
@@ -142,22 +111,15 @@ export class TaksService {
   /**
    * Removes a task by ID
    *
-   * Since the API doesn't support individual task endpoints, this method
-   * fetches all tasks, removes the specific one locally, and then sends
-   * the entire updated collection back to the server.
-   *
    * @param id - The ID of the task to remove
    * @returns An Observable that completes when the operation is finished
    */
-  removeTask(id: number): Observable<void> {
-    // First get all tasks
-    return this.getTask().pipe(
-      map(tasks => {
-        // Filter out the task to remove
-        const filteredTasks = tasks.filter(task => task.id !== id);
-
-        // Send the updated list to the server
-        this.http.put(this.apiUrl, filteredTasks).subscribe();
+  removeTask(id: string | number): Observable<void> {
+    // Use DELETE method directly on the specific task endpoint
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+      catchError(error => {
+        console.error('Error removing task:', error);
+        return throwError(() => new Error('Failed to remove task. Server error.'));
       })
     );
   }

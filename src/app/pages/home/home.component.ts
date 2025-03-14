@@ -98,7 +98,7 @@ export class HomeComponent implements OnInit {
   }
 
   // =============== UPDATE Operations ===============
-  completeTask(id: number): void {
+  completeTask(id: string | number): void {
     const task = this.tasks().find(t => t.id === id);
     if (!task) return;
 
@@ -106,9 +106,9 @@ export class HomeComponent implements OnInit {
     this.updateTaskStatus(id, newStatus);
   }
 
-  private updateTaskStatus(id: number, newStatus: string): void {
+  private updateTaskStatus(id: string | number, newStatus: string): void {
     this.taskService.updateTask(id, { status: newStatus }).subscribe({
-      next: () => {
+      next: (updatedTask) => {
         this.updateTasksList(id, { status: newStatus });
       },
       error: (error) => {
@@ -119,7 +119,9 @@ export class HomeComponent implements OnInit {
   }
 
   // =============== DELETE Operations ===============
-  deleteTask(id: number): void {
+  deleteTask(id: string | number): void {
+    this.error.set(null); // Clear any previous errors
+
     this.taskService.removeTask(id).subscribe({
       next: () => {
         this.removeTaskFromLists(id);
@@ -139,12 +141,12 @@ export class HomeComponent implements OnInit {
     }));
   }
 
-  private removeTaskFromLists(id: number): void {
+  private removeTaskFromLists(id: string | number): void {
     this.tasks.update(tasks => tasks.filter(t => t.id !== id));
     this.allTasks.update(tasks => tasks.filter(t => t.id !== id));
   }
 
-  private updateTasksList(id: number, changes: Partial<Task>): void {
+  private updateTasksList(id: string | number, changes: Partial<Task>): void {
     this.tasks.update(tasks =>
       tasks.map(t => t.id === id ? { ...t, ...changes } : t)
     );

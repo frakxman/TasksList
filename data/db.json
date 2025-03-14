@@ -1,15 +1,9 @@
 {
   "tasks": [
     {
-      "id": "ba55",
+      "id": "b7d4",
       "title": "Task One",
-      "description": "Create a tasks list app",
-      "status": "pending"
-    },
-    {
-      "id": "e8ab",
-      "title": "Task Two",
-      "description": "dfgfdhgf",
+      "description": "Create a new application",
       "status": "pending"
     }
   ]
