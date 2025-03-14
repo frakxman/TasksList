@@ -116,7 +116,8 @@ export class TaksService {
    */
   removeTask(id: string | number): Observable<void> {
     // Use DELETE method directly on the specific task endpoint
-    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).
+    pipe(
       catchError(error => {
         console.error('Error removing task:', error);
         return throwError(() => new Error('Failed to remove task. Server error.'));
@@ -124,3 +125,5 @@ export class TaksService {
     );
   }
 }
+
+

@@ -1,6 +1,12 @@
 {
   "tasks": [
     {
+      "id": "1",
+      "title": "Task One",
+      "description": "Install Angular CLI",
+      "status": "pending"
+    },
+    {
       "id": "2",
       "title": "Task Two",
       "description": "Create a new Angular project",
@@ -65,6 +71,12 @@
       "title": "Task Twelve",
       "description": "Deploy the Angular app to Firebase Hosting",
       "status": "completed"
+    },
+    {
+      "id": "7534",
+      "title": "Task Thirdteen",
+      "description": "Develop the database with .NET",
+      "status": "pending"
     }
   ]
 }
