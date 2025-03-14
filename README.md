@@ -176,6 +176,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-Fabián Rivera Restrepo - [@your_linkendIn](https://www.linkedin.com/in/fabian-rivera-restrepo/) - friverar@uqvirtual.edu.co
+Fabián Rivera Restrepo - [@linkendIn](https://www.linkedin.com/in/fabian-rivera-restrepo/) - friverar@uqvirtual.edu.co
 
 <!-- Project Link: [https://github.com/your-username/tasks-list](https://github.com/your-username/tasks-list) -->
