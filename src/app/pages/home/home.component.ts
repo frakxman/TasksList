@@ -8,6 +8,9 @@ import { TaksService } from '../../services/taks.service';
 
 import { TaskFormComponent } from '../../components/task-form/task-form.component';
 
+// Define un tipo para los posibles filtros de estado
+type StatusFilter = 'all' | 'completed' | 'pending';
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -26,28 +29,105 @@ export class HomeComponent implements OnInit {
   isLoading = signal<boolean>(false);
   error = signal<string | null>(null);
   modalError = signal<string | null>(null);
+  isEditMode = signal<boolean>(false);
+  taskToEdit = signal<Task | null>(null);
+
+  // Status filter signal
+  statusFilter = signal<StatusFilter>('all');
+
+  // Pagination signals
+  currentPage = signal<number>(1);
+  pageSize = signal<number>(10);
 
   // Computed values
   totalTasks = computed(() => this.allTasks().length);
-  completedTasks = computed(() => this.totalTasks() - this.pendingTasks());
-  pendingTasks = computed(() => this.allTasks().filter(task =>
-    task.status === 'pending' || task.status === 'complete'
-  ).length);
+  completedTasks = computed(() => this.allTasks().filter(task => task.status === 'completed').length);
+  pendingTasks = computed(() => this.allTasks().filter(task => task.status !== 'completed').length);
+
+  // Filtered tasks based on search term and status filter
+  filteredTasks = computed(() => {
+    const searchTerm = this.searchTerm().toLowerCase();
+
+    return this.allTasks().filter(task => {
+      // First apply status filter
+      if (this.statusFilter() === 'completed' && task.status !== 'completed') {
+        return false;
+      }
+      if (this.statusFilter() === 'pending' && task.status === 'completed') {
+        return false;
+      }
+
+      // Then apply search term filter
+      if (searchTerm) {
+        return task.title.toLowerCase().includes(searchTerm) ||
+               task.description.toLowerCase().includes(searchTerm);
+      }
+
+      return true;
+    });
+  });
+
+  // Pagination computed values
+  totalPages = computed(() => Math.ceil(this.filteredTasks().length / this.pageSize()));
+  paginatedTasks = computed(() => {
+    const startIndex = (this.currentPage() - 1) * this.pageSize();
+    const endIndex = startIndex + this.pageSize();
+    return this.filteredTasks().slice(startIndex, endIndex);
+  });
+
+  hasPreviousPage = computed(() => this.currentPage() > 1);
+  hasNextPage = computed(() => this.currentPage() < this.totalPages());
 
   ngOnInit(): void {
     this.loadTasks();
+  }
+
+  // =============== Filter Methods ===============
+  applyStatusFilter(filter: StatusFilter): void {
+    this.statusFilter.set(filter);
+    // Reset to first page when filtering
+    this.currentPage.set(1);
+  }
+
+  filterTasks(term: string): void {
+    this.searchTerm.set(term);
+    // Reset to first page when filtering
+    this.currentPage.set(1);
+  }
+
+  // =============== Pagination Methods ===============
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+    }
+  }
+
+  previousPage(): void {
+    if (this.hasPreviousPage()) {
+      this.currentPage.update(page => page - 1);
+    }
+  }
+
+  nextPage(): void {
+    if (this.hasNextPage()) {
+      this.currentPage.update(page => page + 1);
+    }
   }
 
   // =============== CREATE Operations ===============
   openModal(): void {
     this.showModal.set(true);
     this.modalError.set(null);
+    this.isEditMode.set(false);
+    this.taskToEdit.set(null);
   }
 
   closeModal(): void {
     this.showModal.set(false);
     this.modalError.set(null);
     this.error.set(null);
+    this.isEditMode.set(false);
+    this.taskToEdit.set(null);
   }
 
   createTask(task: Omit<Task, 'id'>): void {
@@ -76,7 +156,8 @@ export class HomeComponent implements OnInit {
       next: (tasks) => {
         const normalizedTasks = this.normalizeTasks(tasks);
         this.allTasks.set(normalizedTasks);
-        this.tasks.set(normalizedTasks);
+        // Reset to first page when loading tasks
+        this.currentPage.set(1);
         this.isLoading.set(false);
       },
       error: (error) => {
@@ -87,17 +168,29 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  filterTasks(term: string): void {
-    this.searchTerm.set(term);
-    const searchTerm = term.toLowerCase();
-    const filtered = this.allTasks().filter(task =>
-      task.title.toLowerCase().includes(searchTerm) ||
-      task.description.toLowerCase().includes(searchTerm)
-    );
-    this.tasks.set(filtered);
+  // =============== UPDATE Operations ===============
+  openEditModal(task: Task): void {
+    this.taskToEdit.set(task);
+    this.isEditMode.set(true);
+    this.showModal.set(true);
+    this.modalError.set(null);
   }
 
-  // =============== UPDATE Operations ===============
+  updateExistingTask(task: Task): void {
+    this.modalError.set(null);
+
+    this.taskService.updateTask(task.id, task).subscribe({
+      next: (updatedTask) => {
+        this.updateTasksList(updatedTask.id, updatedTask);
+        this.closeModal();
+      },
+      error: (error) => {
+        console.error('Error updating task:', error);
+        this.modalError.set(error.message || 'Failed to update task. Please try again.');
+      }
+    });
+  }
+
   completeTask(id: string | number): void {
     const task = this.tasks().find(t => t.id === id);
     if (!task) return;

@@ -1,10 +1,76 @@
 {
   "tasks": [
     {
-      "id": "b7d4",
+      "id": "1",
       "title": "Task One",
-      "description": "Create a new application",
+      "description": "Install Angular CLI",
       "status": "pending"
+    },
+    {
+      "id": "2",
+      "title": "Task Two",
+      "description": "Create a new Angular project",
+      "status": "pending"
+    },
+    {
+      "id": "3",
+      "title": "Task Three",
+      "description": "Set up project structure and routing",
+      "status": "pending"
+    },
+    {
+      "id": "4",
+      "title": "Task Four",
+      "description": "Install and configure Tailwind CSS",
+      "status": "pending"
+    },
+    {
+      "id": "5",
+      "title": "Task Five",
+      "description": "Create a reusable button component",
+      "status": "pending"
+    },
+    {
+      "id": "6",
+      "title": "Task Six",
+      "description": "Implement authentication with Firebase",
+      "status": "pending"
+    },
+    {
+      "id": "7",
+      "title": "Task Seven",
+      "description": "Set up a state management system with NgRx",
+      "status": "completed"
+    },
+    {
+      "id": "8",
+      "title": "Task Eight",
+      "description": "Fetch and display API data using HttpClient",
+      "status": "pending"
+    },
+    {
+      "id": "9",
+      "title": "Task Nine",
+      "description": "Create a dark mode toggle feature",
+      "status": "completed"
+    },
+    {
+      "id": "10",
+      "title": "Task Ten",
+      "description": "Optimize performance with lazy loading",
+      "status": "pending"
+    },
+    {
+      "id": "11",
+      "title": "Task Eleven",
+      "description": "Write unit tests for components and services",
+      "status": "pending"
+    },
+    {
+      "id": "12",
+      "title": "Task Twelve",
+      "description": "Deploy the Angular app to Firebase Hosting",
+      "status": "completed"
     }
   ]
 }
