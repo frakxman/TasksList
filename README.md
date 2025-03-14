@@ -2,7 +2,7 @@
 
 A modern task management application developed with Angular 17 and Tailwind CSS, allowing users to create, view, update, and delete tasks intuitively.
 
-![Tasks List App](src/assets/app-screenshot.png)
+![Tasks List App](src/assets/screenshot.png)
 
 ## Features
 
