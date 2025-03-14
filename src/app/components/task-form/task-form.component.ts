@@ -24,6 +24,8 @@ export class TaskFormComponent implements OnInit {
     status: 'pending'
   };
 
+  validationError: string | null = null; // Variable to store validation error messages
+
   ngOnInit(): void {
     // If in edit mode and a task is provided, initialize the form with task data
     if (this.isEditMode && this.taskToEdit) {
@@ -36,17 +38,23 @@ export class TaskFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.task.title && this.task.description) {
-      if (this.isEditMode && this.taskToEdit) {
-        // In edit mode, emit the update event with the full task including ID
-        this.updateTask.emit({
-          id: this.taskToEdit.id,
-          ...this.task
-        });
-      } else {
-        // In create mode, emit the create event
-        this.createTask.emit(this.task);
-      }
+    // Validate that title and description are not empty
+    if (!this.task.title.trim() || !this.task.description.trim()) {
+      this.validationError = 'The title and description cannot be empty. Please provide a title and description for the task.';
+      return;
+    }
+
+    this.validationError = null; // Clear validation error if inputs are valid
+
+    if (this.isEditMode && this.taskToEdit) {
+      // In edit mode, emit the update event with the full task including ID
+      this.updateTask.emit({
+        id: this.taskToEdit.id,
+        ...this.task
+      });
+    } else {
+      // In create mode, emit the create event
+      this.createTask.emit(this.task);
     }
   }
 

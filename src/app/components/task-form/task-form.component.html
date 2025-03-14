@@ -28,6 +28,12 @@
       </div>
     }
 
+    @if (validationError) {
+      <div class="mb-4 p-3 bg-red-500/20 border border-red-500 rounded-lg text-red-200">
+        {{ validationError }}
+      </div>
+    }
+
     <form (ngSubmit)="onSubmit()">
       <div class="mb-4">
         <label for="title" class="block text-white mb-1">Title</label>
