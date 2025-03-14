@@ -1,1 +1,74 @@
-<p>home works!</p>
+<div class="min-h-screen flex flex-col items-center justify-start bg-gradient-to-b from-black to-teal-500 p-6 text-white shadow">
+  <h1 class="text-4xl font-bold mt-4">Tasks List</h1>
+  <p class="mt-2 text-lg">
+    You have completed
+    <span class="font-bold text-teal-300">{{ totalTasks() - pendingTasks() }}</span>
+    of
+    <span class="font-bold">{{ totalTasks() }}</span>
+  </p>
+
+  <!-- Search bar -->
+  <div class="relative mt-4 w-full max-w-md">
+    <input
+      type="text"
+      placeholder="Search task"
+      class="w-full p-2 pl-4 pr-10 rounded-full bg-transparent border border-teal-300 focus:outline-none text-white placeholder-gray-300"
+      (ngModelChange)="filterTasks($event)"
+      [ngModel]="searchTerm()"
+    />
+  </div>
+
+  <!-- Task List -->
+  <ul class="mt-6 w-full max-w-lg space-y-3">
+    @for (task of tasks(); track task.id) {
+      <li class="flex justify-between items-center p-4 bg-teal-600 border border-teal-300 rounded-lg shadow-md">
+        <div class="flex items-center gap-3">
+          <!-- Check Button -->
+          <button (click)="completeTask(task.id)" class="p-2 transition-colors duration-300">
+            <svg
+              viewBox="0 0 405.272 405.272"
+              class="w-6 h-6 transition-colors duration-300 hover:fill-black"
+              xmlns="http://www.w3.org/2000/svg"
+              [attr.fill]="task.status === 'completed' ? '#2dd4bf' : 'white'"
+            >
+              <path d="M393.401,124.425L179.603,338.208c-15.832,15.835-41.514,15.835-57.361,0L11.878,227.836 c-15.838-15.835-15.838-41.52,0-57.358c15.841-15.841,41.521-15.841,57.355-0.006l81.698,81.699L336.037,67.064 c15.841-15.841,41.523-15.829,57.358,0C409.23,82.902,409.23,108.578,393.401,124.425z"/>
+            </svg>
+          </button>
+
+          <!-- Task Content -->
+          <div class="flex flex-col">
+            <p
+              class="text-lg font-semibold"
+              [ngClass]="{ 'line-through text-gray-500': task.status === 'completed' }"
+            >
+              {{ task.title }}
+            </p>
+            <p
+              class="text-sm text-gray-200"
+              [ngClass]="{ 'line-through text-gray-500': task.status === 'completed' }"
+            >
+              {{ task.description }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Delete Button -->
+        <button (click)="deleteTask(task.id)" class="p-2 transition-colors duration-300">
+          <svg
+            viewBox="0 0 348.333 348.334"
+            class="w-6 h-6 transition-colors duration-300 fill-gray-400 hover:fill-red-500"
+            xmlns="http://www.w3.org/2000/svg"
+            xml:space="preserve"
+          >
+            <path d="M336.559,68.611L231.016,174.165l105.543,105.549c15.699,15.705,15.699,41.145,0,56.85 c-7.844,7.844-18.128,11.769-28.407,11.769c-10.296,0-20.581-3.919-28.419-11.769L174.167,231.003L68.609,336.563 c-7.843,7.844-18.128,11.769-28.416,11.769c-10.285,0-20.563-3.919-28.413-11.769c-15.699-15.698-15.699-41.139,0-56.85 l105.54-105.549L11.774,68.611c-15.699-15.699-15.699-41.145,0-56.844c15.696-15.687,41.127-15.687,56.829,0l105.563,105.554 L279.721,11.767c15.705-15.687,41.139-15.687,56.832,0C352.258,27.466,352.258,52.912,336.559,68.611z"/>
+          </svg>
+        </button>
+      </li>
+    }
+  </ul>
+
+  <!-- Add Task Button -->
+  <button class="fixed bottom-6 right-6 w-12 h-12 bg-black text-white rounded-full shadow-lg flex items-center justify-center text-2xl hover:bg-teal-900 transition-colors duration-300">
+    ➕
+  </button>
+</div>
