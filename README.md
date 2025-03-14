@@ -19,6 +19,7 @@ A modern task management application developed with Angular 17 and Tailwind CSS,
 - 🎨 Visual distinction between completed and pending tasks
 - 🏷️ Status indicators and badges for better task management
 - 🔘 Quick filter buttons to show all, pending, or completed tasks
+- 🧪 Comprehensive unit tests for all components and services
 
 ## Project Structure
 
@@ -52,7 +53,7 @@ tasks-list/
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/tasks-list.git
+   git clone https://github.com/frakxman/TasksList.git
    cd tasks-list
    ```
 
@@ -76,6 +77,22 @@ To run the application in development mode:
    ```
 
 3. Open your browser at `http://localhost:4200`
+
+## Running Tests
+
+To run the unit tests:
+
+```bash
+npm test
+```
+
+The application includes comprehensive unit tests for:
+
+- **Services**: Testing all CRUD operations, error handling, and utility methods
+- **Components**: Testing initialization, user interactions, and state management
+- **UI Elements**: Testing the rendering and behavior of UI components
+
+The tests use Angular's testing utilities and Jasmine to ensure the application works correctly.
 
 ## Usage
 
@@ -141,6 +158,9 @@ export interface Task {
 - **Responsive Design**: Interface adaptable to different screen sizes
 - **Reusable Modal**: The same modal component is used for both creating and editing tasks
 - **Context-Aware UI**: Button labels and modal titles change based on whether you're creating or editing a task
+- **Comprehensive Testing**: Unit tests for all components and services with high code coverage
+- **Test-Driven Development**: Tests verify all core functionality including CRUD operations, filtering, and pagination
+- **Mock Services**: Tests use mock services to isolate components and test edge cases
 
 ## Contributing
 

@@ -1,12 +1,6 @@
 {
   "tasks": [
     {
-      "id": "1",
-      "title": "Task One",
-      "description": "Install Angular CLI",
-      "status": "pending"
-    },
-    {
       "id": "2",
       "title": "Task Two",
       "description": "Create a new Angular project",

@@ -192,17 +192,33 @@ export class HomeComponent implements OnInit {
   }
 
   completeTask(id: string | number): void {
-    const task = this.tasks().find(t => t.id === id);
-    if (!task) return;
+    console.log('Completing task with id:', id);
 
+    // Buscar la tarea en allTasks en lugar de tasks
+    const task = this.allTasks().find(t => {
+      // Convertir los IDs al mismo tipo para la comparación
+      const taskId = typeof t.id === 'string' ? parseInt(t.id, 10) : t.id;
+      const compareId = typeof id === 'string' ? parseInt(id, 10) : id;
+      return taskId === compareId;
+    });
+
+    if (!task) {
+      console.error('Task not found:', id);
+      this.error.set('Task not found. Please refresh the page and try again.');
+      return;
+    }
+
+    console.log('Found task:', task);
     const newStatus = task.status === 'completed' ? 'pending' : 'completed';
+    console.log('Changing status to:', newStatus);
+
     this.updateTaskStatus(id, newStatus);
   }
 
   private updateTaskStatus(id: string | number, newStatus: string): void {
     this.taskService.updateTask(id, { status: newStatus }).subscribe({
       next: (updatedTask) => {
-        this.updateTasksList(id, { status: newStatus });
+        this.updateTasksList(id, updatedTask);
       },
       error: (error) => {
         console.error('Error updating task status:', error);
@@ -239,13 +255,29 @@ export class HomeComponent implements OnInit {
     this.allTasks.update(tasks => tasks.filter(t => t.id !== id));
   }
 
-  private updateTasksList(id: string | number, changes: Partial<Task>): void {
+  private updateTasksList(id: string | number, changes: Partial<Task> | Task): void {
+    // Asegurarse de que id sea del mismo tipo en la comparación
+    const taskId = typeof id === 'string' ? parseInt(id, 10) : id;
+
     this.tasks.update(tasks =>
-      tasks.map(t => t.id === id ? { ...t, ...changes } : t)
+      tasks.map(t => {
+        // Convertir el id de la tarea si es necesario
+        const tId = typeof t.id === 'string' ? parseInt(t.id, 10) : t.id;
+        return tId === taskId ? { ...t, ...changes } : t;
+      })
     );
+
     this.allTasks.update(tasks =>
-      tasks.map(t => t.id === id ? { ...t, ...changes } : t)
+      tasks.map(t => {
+        // Convertir el id de la tarea si es necesario
+        const tId = typeof t.id === 'string' ? parseInt(t.id, 10) : t.id;
+        return tId === taskId ? { ...t, ...changes } : t;
+      })
     );
+
+    // Registrar para depuración
+    console.log('Task updated:', id, changes);
+    console.log('Updated tasks:', this.allTasks());
   }
 
   private addTaskToList(newTask: Task): void {
