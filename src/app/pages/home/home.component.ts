@@ -25,6 +25,7 @@ export class HomeComponent implements OnInit {
   showModal = signal<boolean>(false);
   isLoading = signal<boolean>(false);
   error = signal<string | null>(null);
+  modalError = signal<string | null>(null);
 
   // Computed values
   totalTasks = computed(() => this.allTasks().length);
@@ -40,14 +41,18 @@ export class HomeComponent implements OnInit {
   // =============== CREATE Operations ===============
   openModal(): void {
     this.showModal.set(true);
+    this.modalError.set(null);
   }
 
   closeModal(): void {
     this.showModal.set(false);
+    this.modalError.set(null);
     this.error.set(null);
   }
 
   createTask(task: Omit<Task, 'id'>): void {
+    this.modalError.set(null);
+
     this.taskService.createTask(task).subscribe({
       next: (newTask) => {
         this.addTaskToList(newTask);
@@ -55,7 +60,9 @@ export class HomeComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error creating task:', error);
-        this.error.set('Failed to create task. Please try again.');
+
+        // Mostrar el mensaje de error exacto del servicio
+        this.modalError.set(error.message || 'Failed to create task. Please try again.');
       }
     });
   }

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Task } from '../models/task.model';
-import { Observable, map, of } from 'rxjs';
+import { Observable, map, of, throwError, switchMap } from 'rxjs';
 
 /**
  * Task Service
@@ -44,14 +44,51 @@ export class TaksService {
   }
 
   /**
+   * Normalizes a string for comparison by trimming whitespace and converting to lowercase
+   *
+   * @param str - The string to normalize
+   * @returns The normalized string
+   */
+  private normalizeString(str: string): string {
+    return str.trim().toLowerCase();
+  }
+
+  /**
+   * Checks if a task with the same title already exists
+   *
+   * @param tasks - The list of existing tasks
+   * @param task - The task to check for duplicates
+   * @returns True if a task with the same title exists, false otherwise
+   */
+  private isDuplicateTitle(tasks: Task[], task: Omit<Task, 'id'>): boolean {
+    const normalizedTitle = this.normalizeString(task.title);
+
+    return tasks.some(existingTask => {
+      const existingTitle = this.normalizeString(existingTask.title);
+      return existingTitle === normalizedTitle;
+    });
+  }
+
+  /**
    * Creates a new task
    *
    * @param task - The task data to create (without ID)
    * @returns An Observable that emits the created Task with its assigned ID
+   * @throws Error if a task with the same title already exists
    */
   createTask(task: Omit<Task, 'id'>): Observable<Task> {
-    // The backend assigns an ID automatically
-    return this.http.post<Task>(this.apiUrl, task);
+    // First check if a task with the same title exists
+    return this.getTask().pipe(
+      switchMap(tasks => {
+        // Check for duplicate title
+        if (this.isDuplicateTitle(tasks, task)) {
+          return throwError(() => new Error('A task with this title already exists. Please use a different title.'));
+        }
+
+        // If no duplicate, create the task
+        return this.http.post<Task>(this.apiUrl, task);
+      })
+    );
   }
 
   /**
@@ -65,6 +102,7 @@ export class TaksService {
    * @param changes - The partial Task object containing the properties to update
    * @returns An Observable that emits the updated Task
    * @throws Error if the task with the specified ID is not found
+   * @throws Error if the update would create a duplicate title
    */
   updateTask(id: number, changes: Partial<Task>): Observable<Task> {
     // First get all tasks
@@ -78,6 +116,15 @@ export class TaksService {
 
         // Create an updated version of the task
         const updatedTask = { ...tasks[taskIndex], ...changes };
+
+        // Only check for duplicate title if the title is being changed
+        if (changes.title) {
+          // Check if this update would create a duplicate title (excluding the current task)
+          const otherTasks = tasks.filter(t => t.id !== id);
+          if (this.isDuplicateTitle(otherTasks, updatedTask)) {
+            throw new Error('A task with this title already exists. Please use a different title.');
+          }
+        }
 
         // Create a new list with the updated task
         const updatedTasks = [...tasks];

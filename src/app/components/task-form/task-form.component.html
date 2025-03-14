@@ -1,60 +1,68 @@
-<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-  <div class="bg-teal-600 rounded-lg p-6 w-full max-w-md shadow-xl relative">
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="relative bg-teal-800 p-6 rounded-lg shadow-lg w-full max-w-md">
     <!-- Close Button -->
     <button
       (click)="onCancel()"
-      class="absolute top-4 right-4 p-2 transition-colors duration-300"
+      class="absolute top-3 right-3 p-2 transition-colors duration-300"
+      aria-label="Close modal"
     >
       <svg
         viewBox="0 0 348.333 348.334"
-        class="w-6 h-6 transition-colors duration-300 fill-gray-400 hover:fill-red-500"
+        class="w-5 h-5 transition-colors duration-300 fill-gray-400 hover:fill-red-500"
         xmlns="http://www.w3.org/2000/svg"
         xml:space="preserve"
+        aria-hidden="true"
       >
         <path d="M336.559,68.611L231.016,174.165l105.543,105.549c15.699,15.705,15.699,41.145,0,56.85 c-7.844,7.844-18.128,11.769-28.407,11.769c-10.296,0-20.581-3.919-28.419-11.769L174.167,231.003L68.609,336.563 c-7.843,7.844-18.128,11.769-28.416,11.769c-10.285,0-20.563-3.919-28.413-11.769c-15.699-15.698-15.699-41.139,0-56.85 l105.54-105.549L11.774,68.611c-15.699-15.699-15.699-41.145,0-56.844c15.696-15.687,41.127-15.687,56.829,0l105.563,105.554 L279.721,11.767c15.705-15.687,41.139-15.687,56.832,0C352.258,27.466,352.258,52.912,336.559,68.611z"/>
       </svg>
     </button>
 
-    <h2 class="text-2xl font-bold text-white mb-4">Create New Task</h2>
+    <h2 class="text-xl font-bold text-white mb-4">Create New Task</h2>
 
-    <form (ngSubmit)="onSubmit()" class="space-y-4">
-      <div>
-        <label for="title" class="block text-sm font-medium text-white mb-1">Title</label>
+    <!-- Error Message -->
+    @if (error) {
+      <div class="mb-4 p-3 bg-red-500/20 border border-red-500 rounded-lg text-red-200">
+        {{ error }}
+      </div>
+    }
+
+    <form (ngSubmit)="onSubmit()">
+      <div class="mb-4">
+        <label for="title" class="block text-white mb-1">Title</label>
         <input
           type="text"
           id="title"
-          [(ngModel)]="task.title"
           name="title"
-          class="w-full p-2 rounded bg-teal-700 border border-teal-300 text-white placeholder-gray-300 focus:outline-none focus:border-teal-200"
-          placeholder="Enter task title"
+          [(ngModel)]="task.title"
+          class="w-full p-2 rounded bg-teal-700 border border-teal-500 text-white focus:outline-none focus:border-teal-300"
+          placeholder="Task title"
           required
-        />
+        >
       </div>
 
-      <div>
-        <label for="description" class="block text-sm font-medium text-white mb-1">Description</label>
+      <div class="mb-6">
+        <label for="description" class="block text-white mb-1">Description</label>
         <textarea
           id="description"
-          [(ngModel)]="task.description"
           name="description"
-          rows="3"
-          class="w-full p-2 rounded bg-teal-700 border border-teal-300 text-white placeholder-gray-300 focus:outline-none focus:border-teal-200"
-          placeholder="Enter task description"
+          [(ngModel)]="task.description"
+          class="w-full p-2 rounded bg-teal-700 border border-teal-500 text-white focus:outline-none focus:border-teal-300 min-h-[100px]"
+          placeholder="Task description"
           required
         ></textarea>
       </div>
 
-      <div class="flex justify-end gap-3 mt-6">
+      <div class="flex justify-end space-x-3">
         <button
           type="button"
           (click)="onCancel()"
-          class="px-4 py-2 rounded bg-teal-700 text-white hover:bg-teal-800 transition-colors duration-300"
+          class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
         >
           Cancel
         </button>
         <button
           type="submit"
-          class="px-4 py-2 rounded bg-teal-300 text-teal-900 hover:bg-teal-200 transition-colors duration-300"
+          class="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 transition-colors"
         >
           Create Task
         </button>

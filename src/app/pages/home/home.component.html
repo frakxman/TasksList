@@ -138,6 +138,7 @@
     <app-task-form
       (closeModal)="closeModal()"
       (createTask)="createTask($event)"
+      [error]="modalError()"
     />
   }
 </div>

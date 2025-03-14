@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Task } from '../../models/task.model';
@@ -13,21 +13,21 @@ import { Task } from '../../models/task.model';
 export class TaskFormComponent {
   @Output() closeModal = new EventEmitter<void>();
   @Output() createTask = new EventEmitter<Omit<Task, 'id'>>();
+  @Input() error: string | null = null;
 
-  task = {
+  task: Omit<Task, 'id'> = {
     title: '',
     description: '',
     status: 'pending'
   };
 
-  onSubmit() {
-    if (this.task.title.trim() && this.task.description.trim()) {
+  onSubmit(): void {
+    if (this.task.title && this.task.description) {
       this.createTask.emit(this.task);
-      this.closeModal.emit();
     }
   }
 
-  onCancel() {
+  onCancel(): void {
     this.closeModal.emit();
   }
 }
