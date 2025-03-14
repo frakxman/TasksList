@@ -1,33 +1,15 @@
 {
   "tasks": [
     {
-      "id": "5",
-      "title": "Task Five",
-      "description": "Create a reusable button component",
+      "id": 1,
+      "title": "Task One",
+      "description": "Create a tasks list",
       "status": "pending"
     },
     {
-      "id": "7",
-      "title": "Task Seven",
-      "description": "Set up a state management system with NgRx",
-      "status": "pending"
-    },
-    {
-      "id": "8",
-      "title": "Task Eight",
-      "description": "Fetch and display API data using HttpClient",
-      "status": "pending"
-    },
-    {
-      "id": "10",
-      "title": "Task Ten",
-      "description": "Optimize performance with lazy loading",
-      "status": "pending"
-    },
-    {
-      "id": "11",
-      "title": "Task Eleven",
-      "description": "Write unit tests for components and services",
+      "id": "c653",
+      "title": "Task One",
+      "description": "Create a task list app",
       "status": "pending"
     }
   ]

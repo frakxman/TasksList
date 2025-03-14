@@ -1,74 +1,143 @@
+<!-- Main Container -->
 <div class="min-h-screen flex flex-col items-center justify-start bg-gradient-to-b from-black to-teal-500 p-6 text-white shadow">
-  <h1 class="text-4xl font-bold mt-4">Tasks List</h1>
-  <p class="mt-2 text-lg">
-    You have completed
-    <span class="font-bold text-teal-300">{{ totalTasks() - pendingTasks() }}</span>
-    of
-    <span class="font-bold">{{ totalTasks() }}</span>
-  </p>
+  <!-- Header Section -->
+  <header class="w-full max-w-lg text-center mb-6">
+    <h1 class="text-2xl font-bold text-white mb-2">Tasks List</h1>
+    <p class="text-lg">
+      You have completed
+      <span class="font-bold text-teal-300">{{ completedTasks() }}</span>
+      of
+      <span class="font-bold">{{ totalTasks() }}</span>
+      Tasks
+    </p>
+  </header>
 
-  <!-- Search bar -->
-  <div class="relative mt-4 w-full max-w-md">
+  <!-- Error Message -->
+  @if (error()) {
+    <div class="w-full max-w-lg mb-4 p-4 bg-red-500/20 border border-red-500 rounded-lg text-red-200">
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Search Section -->
+  <div class="relative w-full max-w-md mb-6">
     <input
       type="text"
       placeholder="Search task"
       class="w-full p-2 pl-4 pr-10 rounded-full bg-transparent border border-teal-300 focus:outline-none text-white placeholder-gray-300"
       (ngModelChange)="filterTasks($event)"
       [ngModel]="searchTerm()"
+      aria-label="Search tasks"
     />
+    <button
+      (click)="filterTasks(searchTerm())"
+      class="absolute right-3 top-1/2 -translate-y-1/2 p-1 transition-colors duration-300"
+      aria-label="Search tasks"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        class="w-5 h-5 transition-colors duration-300 fill-gray-400 hover:fill-teal-300"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+      </svg>
+    </button>
   </div>
 
-  <!-- Task List -->
-  <ul class="mt-6 w-full max-w-lg space-y-3">
-    @for (task of tasks(); track task.id) {
-      <li class="flex justify-between items-center p-4 bg-teal-600 border border-teal-300 rounded-lg shadow-md">
-        <div class="flex items-center gap-3">
-          <!-- Check Button -->
-          <button (click)="completeTask(task.id)" class="p-2 transition-colors duration-300">
-            <svg
-              viewBox="0 0 405.272 405.272"
-              class="w-6 h-6 transition-colors duration-300 hover:fill-black"
-              xmlns="http://www.w3.org/2000/svg"
-              [attr.fill]="task.status === 'completed' ? '#2dd4bf' : 'white'"
+  <!-- Task List Section -->
+  @if (isLoading()) {
+    <div class="w-full max-w-lg text-center py-8 text-xl text-teal-300">
+      Loading your tasks...
+    </div>
+  } @else if (tasks().length === 0) {
+    <div class="w-full max-w-lg text-center py-8">
+      <button
+        (click)="openModal()"
+        class="text-xl text-teal-300 hover:text-teal-200 transition-colors duration-300 cursor-pointer"
+      >
+        🎉 Create your first task! 🎯
+      </button>
+    </div>
+  } @else {
+    <ul class="w-full max-w-lg space-y-3" role="list">
+      @for (task of tasks(); track task.id) {
+        <li
+          class="flex justify-between items-center p-4 bg-teal-600 border border-teal-300 rounded-lg shadow-md"
+          role="listitem"
+        >
+          <!-- Task Content -->
+          <div class="flex items-center gap-3 flex-1">
+            <!-- Check Button -->
+            <button
+              (click)="completeTask(task.id)"
+              class="p-2 transition-colors duration-300"
+              [attr.aria-label]="task.status === 'completed' ? 'Mark as pending' : 'Mark as completed'"
+              [attr.aria-pressed]="task.status === 'completed'"
             >
-              <path d="M393.401,124.425L179.603,338.208c-15.832,15.835-41.514,15.835-57.361,0L11.878,227.836 c-15.838-15.835-15.838-41.52,0-57.358c15.841-15.841,41.521-15.841,57.355-0.006l81.698,81.699L336.037,67.064 c15.841-15.841,41.523-15.829,57.358,0C409.23,82.902,409.23,108.578,393.401,124.425z"/>
+              <svg
+                viewBox="0 0 405.272 405.272"
+                class="w-6 h-6 transition-colors duration-300 hover:fill-black"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                [attr.fill]="task.status === 'completed' ? '#2dd4bf' : 'white'"
+              >
+                <path d="M393.401,124.425L179.603,338.208c-15.832,15.835-41.514,15.835-57.361,0L11.878,227.836 c-15.838-15.835-15.838-41.52,0-57.358c15.841-15.841,41.521-15.841,57.355-0.006l81.698,81.699L336.037,67.064 c15.841-15.841,41.523-15.829,57.358,0C409.23,82.902,409.23,108.578,393.401,124.425z"/>
+              </svg>
+            </button>
+
+            <!-- Task Details -->
+            <div class="flex flex-col flex-1">
+              <p
+                class="text-lg font-semibold"
+                [ngClass]="{ 'line-through text-gray-500': task.status === 'completed' }"
+              >
+                {{ task.title }}
+              </p>
+              <p
+                class="text-sm text-gray-200"
+                [ngClass]="{ 'line-through text-gray-500': task.status === 'completed' }"
+              >
+                {{ task.description }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Delete Button -->
+          <button
+            (click)="deleteTask(task.id)"
+            class="p-2 transition-colors duration-300 ml-4"
+            aria-label="Delete task"
+          >
+            <svg
+              viewBox="0 0 348.333 348.334"
+              class="w-6 h-6 transition-colors duration-300 fill-gray-400 hover:fill-red-500"
+              xmlns="http://www.w3.org/2000/svg"
+              xml:space="preserve"
+              aria-hidden="true"
+            >
+              <path d="M336.559,68.611L231.016,174.165l105.543,105.549c15.699,15.705,15.699,41.145,0,56.85 c-7.844,7.844-18.128,11.769-28.407,11.769c-10.296,0-20.581-3.919-28.419-11.769L174.167,231.003L68.609,336.563 c-7.843,7.844-18.128,11.769-28.416,11.769c-10.285,0-20.563-3.919-28.413-11.769c-15.699-15.698-15.699-41.139,0-56.85 l105.54-105.549L11.774,68.611c-15.699-15.699-15.699-41.145,0-56.844c15.696-15.687,41.127-15.687,56.829,0l105.563,105.554 L279.721,11.767c15.705-15.687,41.139-15.687,56.832,0C352.258,27.466,352.258,52.912,336.559,68.611z"/>
             </svg>
           </button>
-
-          <!-- Task Content -->
-          <div class="flex flex-col">
-            <p
-              class="text-lg font-semibold"
-              [ngClass]="{ 'line-through text-gray-500': task.status === 'completed' }"
-            >
-              {{ task.title }}
-            </p>
-            <p
-              class="text-sm text-gray-200"
-              [ngClass]="{ 'line-through text-gray-500': task.status === 'completed' }"
-            >
-              {{ task.description }}
-            </p>
-          </div>
-        </div>
-
-        <!-- Delete Button -->
-        <button (click)="deleteTask(task.id)" class="p-2 transition-colors duration-300">
-          <svg
-            viewBox="0 0 348.333 348.334"
-            class="w-6 h-6 transition-colors duration-300 fill-gray-400 hover:fill-red-500"
-            xmlns="http://www.w3.org/2000/svg"
-            xml:space="preserve"
-          >
-            <path d="M336.559,68.611L231.016,174.165l105.543,105.549c15.699,15.705,15.699,41.145,0,56.85 c-7.844,7.844-18.128,11.769-28.407,11.769c-10.296,0-20.581-3.919-28.419-11.769L174.167,231.003L68.609,336.563 c-7.843,7.844-18.128,11.769-28.416,11.769c-10.285,0-20.563-3.919-28.413-11.769c-15.699-15.698-15.699-41.139,0-56.85 l105.54-105.549L11.774,68.611c-15.699-15.699-15.699-41.145,0-56.844c15.696-15.687,41.127-15.687,56.829,0l105.563,105.554 L279.721,11.767c15.705-15.687,41.139-15.687,56.832,0C352.258,27.466,352.258,52.912,336.559,68.611z"/>
-          </svg>
-        </button>
-      </li>
-    }
-  </ul>
+        </li>
+      }
+    </ul>
+  }
 
   <!-- Add Task Button -->
-  <button class="fixed bottom-6 right-6 w-12 h-12 bg-black text-white rounded-full shadow-lg flex items-center justify-center text-2xl hover:bg-teal-900 transition-colors duration-300">
+  <button
+    (click)="openModal()"
+    class="fixed bottom-6 right-6 w-12 h-12 bg-black text-white rounded-full shadow-lg flex items-center justify-center text-2xl hover:bg-teal-900 transition-colors duration-300"
+    aria-label="Create new task"
+  >
     ➕
   </button>
+
+  <!-- Task Form Modal -->
+  @if (showModal()) {
+    <app-task-form
+      (closeModal)="closeModal()"
+      (createTask)="createTask($event)"
+    />
+  }
 </div>
